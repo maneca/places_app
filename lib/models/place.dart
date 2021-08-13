@@ -4,7 +4,7 @@ import './place_location.dart';
 class Place{
   final String id;
   final String name;
-  final PlaceLocation location;
+  final PlaceLocation? location;
   final File image;
 
   Place({

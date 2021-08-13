@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/great_places.dart';
 import '../widgets/image_input.dart';
 
 class AddPlaceScreen extends StatefulWidget {
@@ -13,16 +16,21 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
   final _form = GlobalKey<FormState>();
   var _isLoading = false;
   var _placeName = "";
+  File? _pickedImage;
+
+  void _selectImage(File pickedImage){
+    _pickedImage = pickedImage;
+  }
 
   void _saveForm(){
-    if(_form.currentState!.validate()){
+    if(_form.currentState!.validate() || _pickedImage != null){
       setState(() {
         _isLoading = true;
       });
 
       _form.currentState!.save();
 
-      // ...
+      Provider.of<GreatPlaces>(context, listen: false).addPlace(_placeName, _pickedImage!);
 
       setState(() {
         _isLoading = false;
@@ -65,7 +73,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                          },
                        ),
                       SizedBox(height: 10,),
-                      ImageInput()
+                      ImageInput(_selectImage)
                     ],
                   ),
                 ),
@@ -73,7 +81,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
             ),
           ),
           ElevatedButton.icon(
-            onPressed: () { _saveForm(); },
+            onPressed: _saveForm,
             icon: Icon(Icons.add),
             label: Text("Add place"),
             style: ElevatedButton.styleFrom(
