@@ -19,23 +19,34 @@ class PlacesListScreen extends StatelessWidget {
               icon: Icon(Icons.add))
         ],
       ),
-      body: Consumer<GreatPlaces>(
-        child: Center(
-          child: Text("There are no places added"),
-        ),
-        builder: (ctx, greatPlaces, ch) => greatPlaces.places.length == 0
-            ? ch!
-            : ListView.builder(
-                itemCount: greatPlaces.places.length,
-                itemBuilder: (ctx, i) => ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: FileImage(
-                      greatPlaces.places[i].image
+      body: FutureBuilder(
+        future: Provider.of<GreatPlaces>(context, listen: false)
+            .fetchAndSetPlaces(),
+        builder: (builder, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? Center(child: CircularProgressIndicator())
+            : snapshot.hasError
+                ? Center(
+                    child: Text(snapshot.error.toString()),
+                  )
+                : Consumer<GreatPlaces>(
+                    child: Center(
+                      child: Text("There are no places added"),
                     ),
+                    builder: (ctx, greatPlaces, ch) =>
+                        greatPlaces.places.length == 0
+                            ? ch!
+                            : ListView.builder(
+                                itemCount: greatPlaces.places.length,
+                                itemBuilder: (ctx, i) => ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundImage: FileImage(
+                                            greatPlaces.places[i].image),
+                                      ),
+                                      title: Text(greatPlaces.places[i].name),
+                                      onTap: () {},
+                                    )),
                   ),
-                  title: Text(greatPlaces.places[i].name),
-                  onTap: (){},
-                )),
       ),
     );
   }
